@@ -4,6 +4,7 @@
 .vscode/
 #Cache folder
 .alcache/
+__pycache__/
 #Symbols folder
 .alpackages/
 #Snapshots folder
@@ -21,3 +22,13 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+#build folder
+build/
+#install folder
+install/
+#notebook forder
+.ipynb_checkpoints/
+#venv forder
+.venv/
+#log forder
+log/
