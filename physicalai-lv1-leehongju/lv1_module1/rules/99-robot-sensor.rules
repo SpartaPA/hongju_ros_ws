@@ -1,0 +1,7 @@
+# virtual robot sensor rules
+
+# LiDAR
+SUBSYSTEM=="block", KERNEL=="loop22", SYMLINK+="robot_lidar", MODE="0666"
+
+# IMU
+SUBSYSTEM=="block", KERNEL=="loop23", SYMLINK+="robot_imu", MODE="0666"

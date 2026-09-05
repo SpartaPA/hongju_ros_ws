@@ -1,0 +1,5 @@
+# LiDAR
+ATTR{diskseq}=="49", KERNEL=="loop22", ATTR{size}=="32768", ATTR{stat}=="79 0 1372"
+
+# IMU
+ATTR{diskseq}=="51", KERNEL=="loop23", ATTR{size}=="49152", ATTR{stat}=="164 0 50496"
