@@ -1,0 +1,12 @@
+# 환경 / 캐시 — 커밋하지 않습니다
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+.virtual_documents/
+
+# OS
+Thumbs.db
+.DS_Store
