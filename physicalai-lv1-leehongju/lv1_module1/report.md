@@ -147,7 +147,7 @@
    ```
    
    
-4. **두 장치를 구분한 속성**: 라이다 `___` / IMU `___`
+4. **두 장치를 구분한 속성**: 라이다 `KERNEL=="loop22", SYMLINK+="robot_lidar"` / IMU `KERNEL=="loop23", SYMLINK+="robot_imu"`
    가상 sensor 장치 생성
    ```
    mkdir -p ~/fake_sensors && cd ~/fake_sensors

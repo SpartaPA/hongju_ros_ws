@@ -33,16 +33,6 @@ class DistanceWarningNode(Node):
             )
         else:
             self.get_logger().info(f'Current Distance: {distance:.2f}m')
-        
-    def _validate_and_set_rate(self, rate_val: float) -> float:
-        """publish_rate 파라미터 유효성 검증 및 예외 처리"""
-        if rate_val <= 0.0:
-            self.get_logger().error(
-                f'잘못된 publish_rate ({rate_val} Hz)! 0 이하의 주기는 허용되지 않습니다. '
-                f'안전을 위해 기본값 (1.0 Hz)으로 자동 보정합니다.'
-                )
-            return 1.0
-        return rate_val
 
 
 def main(args=None):

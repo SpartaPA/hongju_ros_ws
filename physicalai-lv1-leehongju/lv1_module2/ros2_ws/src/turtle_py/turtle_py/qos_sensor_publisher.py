@@ -20,7 +20,7 @@ reliability 파라미터는 read_only 로 선언했습니다. 바꾸려면 노�
 import math
 
 import rclpy
-from rcl_interfaces.msg import ParameterDescriptor
+from rcl_interfaces.msg import ParameterDescriptor, SetParametersResult
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import (DurabilityPolicy, HistoryPolicy, QoSProfile,
@@ -71,7 +71,11 @@ class QosSensorPublisher(Node):
                              durability=DurabilityPolicy.VOLATILE)
         self._pose_sub = self.create_subscription(Pose, 'turtle1/pose', self._on_pose, sub_qos)
         self._pub = self.create_publisher(Float32, 'turtle_distance', pub_qos)
-        self._timer = self.create_timer(1.0 / rate, self._on_timer)
+        self._rate = rate
+        self._timer = self.create_timer(1.0 / self._rate, self._on_timer)
+
+        # 런타임 중 `ros2 param set ... publish_rate`로 값이 바뀌어도 검증되도록 콜백 등록
+        self.add_on_set_parameters_callback(self._on_parameters_set)
 
         self.get_logger().info(
             f'qos_sensor_publisher 시작: /turtle_distance reliability={reliability_str}, '
@@ -87,15 +91,27 @@ class QosSensorPublisher(Node):
         msg.data = math.hypot(self._latest_pose.x, self._latest_pose.y)
         self._pub.publish(msg)
         
-    def _validate_and_set_rate(self, rate_val: float) -> float:
-        """publish_rate 파라미터 유효성 검증 및 예외 처리"""
-        if rate_val <= 0.0:
-            self.get_logger().error(
-                f'잘못된 publish_rate ({rate_val} Hz)! 0 이하의 주기는 허용되지 않습니다. '
-                f'안전을 위해 기본값 (1.0 Hz)으로 자동 보정합니다.'
-                )
-            return 1.0
-        return rate_val
+    def _on_parameters_set(self, params):
+        """런타임 파라미터 변경 검증 콜백.
+
+        publish_rate가 0 이하로 바뀌려는 요청은 거부하고, 유효하면
+        실제로 타이머 주기까지 갱신한다 (reliability는 read_only라 여기 오지 않음).
+        """
+        for param in params:
+            if param.name == 'publish_rate':
+                if param.value <= 0.0:
+                    self.get_logger().error(
+                        f'잘못된 publish_rate ({param.value} Hz)! 0 이하의 주기는 거부합니다. '
+                        f'현재 값 {self._rate} Hz를 유지합니다.'
+                    )
+                    return SetParametersResult(
+                        successful=False,
+                        reason='publish_rate는 0보다 커야 합니다.'
+                    )
+                self._rate = param.value
+                self._timer.timer_period_ns = int((1.0 / self._rate) * 1e9)
+                self.get_logger().info(f'publish_rate가 {self._rate} Hz로 변경되었습니다.')
+        return SetParametersResult(successful=True)
 
 
 def main(args=None):

@@ -244,17 +244,6 @@ class PolygonActionServer(Node):
             return result
         finally:
             self._busy = False
-            
-    def _on_waypoints_received(self, msg: WaypointList):
-        """WaypointList 수신 콜백 예외 처리"""
-        try:
-            if not msg.waypoints:
-                self.get_logger().warn('수신된 WaypointList가 비어 있습니다. 동작을 스킵합니다.')
-                return
-
-            # 정상 경유점 처리 로직 수행...
-        except Exception as e:
-            self.get_logger().error(f'경유점 데이터 처리 중 예외 발생: {str(e)}')
 
 
 def main(args=None):
