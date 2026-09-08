@@ -28,7 +28,8 @@ class ToggleServers(Node):
         self._pose_sub = self.create_subscription(
             Pose, '/turtle1/pose', self._on_pose, 10
         )
-        self._distance_pub = self.create_publisher(Float32, '/turtle_distance', qos_profile_sensor_data)
+        self._distance_pub = self.create_publisher(
+            Float32, '/turtle_distance', qos_profile_sensor_data)
         self._cmd_pub = self.create_publisher(Twist, '/turtle1/cmd_vel', 10)
 
         # 3. 서비스 서버 및 클라이언트 생성

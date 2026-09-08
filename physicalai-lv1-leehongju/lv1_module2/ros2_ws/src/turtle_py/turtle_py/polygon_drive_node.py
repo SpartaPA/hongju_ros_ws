@@ -33,7 +33,7 @@ class polygon_drive_node(Node):
 
         # 허용 오차 (Tolerance) 설정
         self.dist_tolerance = 0.01  # 거리 허용 오차 (1cm)
-        self.angle_tolerance = 0.005 # 각도 허용 오차 (약 0.3도)
+        self.angle_tolerance = 0.005  # 각도 허용 오차 (약 0.3도)
 
         # 상태 및 제어 변수
         self.current_pose = None

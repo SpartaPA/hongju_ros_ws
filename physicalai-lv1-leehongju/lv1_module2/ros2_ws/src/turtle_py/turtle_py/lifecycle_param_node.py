@@ -76,7 +76,7 @@ class LifecycleParamNode(Node):
             )
 
 
-def main(args=None):    
+def main(args=None):
     # ROS2 초기화
     rclpy.init(args=args)
 
@@ -92,7 +92,7 @@ def main(args=None):
     finally:
         # 노드 자원 해제
         node.destroy_node()
-        
+
         # ROS2 통신 종료
         # rclpy가 아직 shutdown되지 않은 경우에만 shutdown() 호출
         if rclpy.ok():

@@ -15,16 +15,19 @@ def normalize_angle(angle: float) -> float:
     return angle
 
 
-def calculate_target_angle(curr_x: float, curr_y: float, target_x: float, target_y: float) -> float:
+def calculate_target_angle(curr_x: float, curr_y: float,
+                           target_x: float, target_y: float) -> float:
     """현재 위치에서 목표 위치를 향하는 사잇각(-pi ~ pi)을 계산합니다."""
     dx = target_x - curr_x
     dy = target_y - curr_y
     return normalize_angle(math.atan2(dy, dx))
 
 
-def is_waypoint_reached(curr_x: float, curr_y: float, target_x: float, target_y: float, tolerance: float) -> bool:
+def is_waypoint_reached(curr_x: float, curr_y: float,
+                        target_x: float, target_y: float,
+                        tolerance: float) -> bool:
     """현재 위치가 경유점의 허용 오차 범위 내에 도달했는지 판정합니다."""
     if tolerance <= 0.0:
-        raise ValueError("tolerance는 0보다 커야 합니다.")
+        raise ValueError("tolerance는 0보다 큰 양수여야 합니다.")
     dist = calculate_distance(curr_x, curr_y, target_x, target_y)
     return dist <= tolerance

@@ -42,8 +42,9 @@ setup(
             'qos_subscriber = turtle_py.qos_subscriber:main',
             'turtle_distance_subscriber = turtle_py.qos_subscriber:main',     # launch 및 요구스펙용 매핑
             'qos_sensor_publisher = turtle_py.qos_sensor_publisher:main',
-            'turtle_distance_publisher = turtle_py.qos_sensor_publisher:main', # launch 및 요구스펙용 매핑
+            'turtle_distance_publisher = turtle_py.qos_sensor_publisher:main',  # launch 및 요구스펙용 매핑
             'waypoint_publisher = turtle_py.waypoint_publisher:main',
+            'tf_marker_publisher = turtle_py.tf_marker_publisher:main',
         ],
     },
 )

@@ -39,7 +39,17 @@ class QosSensorPublisher(Node):
             ParameterDescriptor(description='best_effort | reliable (생성 시 고정)', read_only=True))
         self.declare_parameter('publish_rate', 10.0)
         reliability_str = self.get_parameter('reliability').value
-        rate = self.get_parameter('publish_rate').value
+        raw_rate = self.get_parameter('publish_rate').value
+
+        # 0 나누기 방지를 위한 rate 예외 처리 및 logging
+        if raw_rate <= 0.0:
+            self.get_logger().error(
+                f'잘못된 publish_rate ({raw_rate} Hz)! 0 이하의 주기는 허용되지 않습니다. '
+                f'안전을 위해 기본값 (10.0 Hz)으로 자동 보정합니다.'
+            )
+            rate = 10.0
+        else:
+            rate = float(raw_rate)
 
         if reliability_str == 'best_effort':
             # rclpy 가 제공하는 센서용 프리셋:
@@ -52,7 +62,8 @@ class QosSensorPublisher(Node):
                                  reliability=ReliabilityPolicy.RELIABLE,
                                  durability=DurabilityPolicy.VOLATILE)
         else:
-            raise ValueError(f'reliability 파라미터는 best_effort 또는 reliable 이어야 합니다: {reliability_str}')
+            raise ValueError(
+                f'reliability 파라미터는 best_effort 또는 reliable 이어야 합니다: {reliability_str}')
 
         self._latest_pose = None
         sub_qos = QoSProfile(history=HistoryPolicy.KEEP_LAST, depth=10,
@@ -75,6 +86,16 @@ class QosSensorPublisher(Node):
         msg = Float32()
         msg.data = math.hypot(self._latest_pose.x, self._latest_pose.y)
         self._pub.publish(msg)
+        
+    def _validate_and_set_rate(self, rate_val: float) -> float:
+        """publish_rate 파라미터 유효성 검증 및 예외 처리"""
+        if rate_val <= 0.0:
+            self.get_logger().error(
+                f'잘못된 publish_rate ({rate_val} Hz)! 0 이하의 주기는 허용되지 않습니다. '
+                f'안전을 위해 기본값 (1.0 Hz)으로 자동 보정합니다.'
+                )
+            return 1.0
+        return rate_val
 
 
 def main(args=None):

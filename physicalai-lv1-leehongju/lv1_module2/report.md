@@ -953,14 +953,14 @@ ros2 run turtle_py toggle_servers
    
    
 5. **`src` / `build` / `install` / `log` 의 역할** (4줄)
-   ㅁ
+   
    src: 개발자가 직접 작성한 C++/Python 소스 코드, 패키지 설정 파일, 인터페이스 정의 파일을 보관하는 원본 소스 코드 디렉터리입니다.
    build: colcon build 실행 시 C++ 컴파일 중간 파일, CMake 생성 파일, Python 빌드 캐시 등이 저장되는 임시 작업 디렉터리입니다.
    install: 빌드가 완료된 실행 파일, 라이브러리, 파라미터/Launch 파일, 생성된 파이썬/C++ 인터페이스 바인딩 모듈이 최종 배치되는 실행 환경 디렉터리입니다.
    log: colcon build 또는 ros2 launch 실행 중 발생한 빌드 과정의 상세 로그, 경고, 에러 기록이 저장되는 디버깅용 로그 디렉터리입니다.
-   ㅁ
-   ㅁ
-   ㅁ
+   
+   
+   
 ## 9. launch 파일로 시스템 기동 — 다중 노드와 파라미터 주입
 
 1. **`ros2 launch` 실행 출력**
@@ -1052,3 +1052,112 @@ WARNING: Be aware that there are nodes in the graph that share an exact name, wh
    ㅁ
    ㅁ
    ㅁ
+## 10. 시각화·기록·테스트로 검증하기
+1. **`rqt_graph` 캡처** — 데이터 미수신 진단 절차 (단계별)
+   
+   ![[2026-09-08_10-36-11.png]]
+   
+   데이터 미수신 시 진단 절차
+   * ros2 topic list 및 echo: 토픽 생성 여부 및 실제 데이터 흐름 유무 확인.
+   * ros2 topic info -v (Pub/Sub 수 확인): 발행자 및 구독자 노드가 그래프 상에 올바르게 바인딩되어 있는지 점검.
+   * QoS 프로필 대조: Publisher/Subscriber 간 Reliability 및 Durability 호환성 검증 (BEST_EFFORT vs RELIABLE 등).
+   * ros2 node list 및 ROS_DOMAIN_ID: 상위 의존 노드의 생존 상태 및 도메인 환경 변수 설정 일치 여부 확인.
+   
+   
+2. **RViz2 TF + 경유점 마커 캡처**
+   
+   ![[2026-09-08_10-59-19.png]]
+   
+   ![[2026-09-08_11-07-10.png]]
+   
+   
+3. **`ros2 bag play` 재생 중 구독자 로그** — 기록된 토픽과 메시지 수: `___`
+   
+   ```
+[INFO] [1788833871.670389183] [qos_subscriber]: #165 수신: 3.536
+[INFO] [1788833871.770182565] [qos_subscriber]: #166 수신: 3.536
+[INFO] [1788833871.875974678] [qos_subscriber]: #167 수신: 3.536
+[INFO] [1788833871.973387907] [qos_subscriber]: #168 수신: 3.536
+[INFO] [1788833872.007844919] [qos_subscriber]: [통계] 지난 2초 처리 20개 (누적 168개)
+[INFO] [1788833872.072772919] [qos_subscriber]: #169 수신: 3.536
+[INFO] [1788833872.170457343] [qos_subscriber]: #170 수신: 3.536
+[INFO] [1788833872.270438834] [qos_subscriber]: #171 수신: 3.536
+[INFO] [1788833872.372253779] [qos_subscriber]: #172 수신: 3.536
+[INFO] [1788833872.470459516] [qos_subscriber]: #173 수신: 3.536
+[INFO] [1788833872.570163019] [qos_subscriber]: #174 수신: 3.536
+[INFO] [1788833872.670466672] [qos_subscriber]: #175 수신: 3.536
+[INFO] [1788833872.770534511] [qos_subscriber]: #176 수신: 3.536
+[INFO] [1788833872.870517799] [qos_subscriber]: #177 수신: 3.536
+[INFO] [1788833872.970402847] [qos_subscriber]: #178 수신: 3.536
+   ```
+   
+   ```
+Files:             turtle_test_bag_0.db3
+Bag size:          77.4 KiB
+Storage id:        sqlite3
+Duration:          12.148752456s
+Start:             Sep  8 2026 11:09:30.649691992 (1788833370.649691992)
+End:               Sep  8 2026 11:09:42.798444448 (1788833382.798444448)
+Messages:          872
+Topic information: Topic: /turtle_distance | Type: std_msgs/msg/Float32 | Count: 112 | Serialization Format: cdr
+                   Topic: /turtle1/pose | Type: turtlesim/msg/Pose | Count: 760 | Serialization Format: cdr
+   ```
+   
+   
+4. **`pytest` 통과 출력** — 작성한 테스트 3개의 의도
+   
+   ```
+build/turtle_py/pytest.xml: 3 tests, 0 errors, 0 failures, 0 skipped - turtle_py.test.test_calculator: - test_calculate_distance: PASSED - test_calculate_target_angle: PASSED - test_is_waypoint_reached: PASSED Summary: 3 tests, 0 errors, 0 failures, 0 skipped
+   ```
+   
+   목표까지의 거리 검증, 목표 각도 및 정규화 검증, 경유점 도달 판정 및 허용 오차 검증
+   
+   
+
+5. **함수를 틀리게 바꿨을 때 실패 출력**
+   ㅁ
+   ```
+Summary: 1 package finished [0.51s]
+  1 package had test failures: turtle_py
+build/turtle_py/pytest.xml: 3 tests, 0 errors, 1 failure, 0 skipped
+- turtle_py.test.test_calculator test_calculate_distance
+  <<< failure message
+    assert False
+     +  where False = <built-in function isclose>(0.0, 5.0)
+     +    where <built-in function isclose> = math.isclose
+     +    and   0.0 = calculate_distance(0.0, 0.0, 3.0, 4.0)
+  >>>
+   ```
+   
+   
+6. **예외 처리·logging 동작 확인**: `___`
+   
+   
+   ```
+# 0 나누기 방지를 위한 rate 예외 처리 및 logging
+
+if raw_rate <= 0.0:
+
+self.get_logger().error(
+
+f'잘못된 publish_rate ({raw_rate} Hz)! 0 이하의 주기는 허용되지 않습니다. '
+
+f'안전을 위해 기본값 (10.0 Hz)으로 자동 보정합니다.'
+
+)
+
+rate = 10.0
+
+else:
+
+rate = float(raw_rate)
+   ```
+   
+   ```
+ros2 run turtle_py qos_sensor_publisher --ros-args -p publish_rate:=0.0
+
+[ERROR] [1788837774.060735246] [qos_sensor_publisher]: 잘못된 publish_rate (0.0 Hz)! 0 이하의 주기는 허용되지 않습니다. 안전을 위해 기본값 (10.0 Hz)으로 자동 보정합니다.
+   ```
+   
+   
+   

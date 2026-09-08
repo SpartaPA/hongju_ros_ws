@@ -65,19 +65,19 @@ def generate_launch_description():
     use_examples_arg = DeclareLaunchArgument(
         'use_examples', default_value='false',
         description='true 지정 시 turtle_examples 노드 실행, false 지정 시 student_package 실행')
-    
+
     spawn_second_arg = DeclareLaunchArgument(
         'spawn_second', default_value='false',
         description='true 지정 시 turtle2를 생성하고 네임스페이스 /turtle2로 발행자 추가 실행')
-    
+
     params_file_arg = DeclareLaunchArgument(
         'params_file', default_value=default_params,
         description='노드 파라미터 YAML 파일 절대 경로')
-    
+
     student_pkg_arg = DeclareLaunchArgument(
         'student_package', default_value='turtle_py',
         description='학생 패키지 이름')
-    
+
     student_action_arg = DeclareLaunchArgument(
         'student_action_exec', default_value='polygon_action_server',
         description='학생 패키지의 DrawPolygon 액션 서버 실행파일 이름')
